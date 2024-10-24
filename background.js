@@ -16,70 +16,27 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     mouseControlActive = true;  // Mark control as active
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       let tab = tabs[0];
-      injectMouseControlScripts(tab.id, true); // Start mouse control on current tab
+      injectMouseControlScripts(tab.id, true); // Start mouse control on the current tab
     });
 
   } else if (request.action === 'stop') {
     mouseControlActive = false;  // Mark control as inactive
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      let tab = tabs[0];
-      injectMouseControlScripts(tab.id, false); // Stop mouse control on current tab
+    // Stop mouse control on **all tabs**
+    chrome.tabs.query({}, (tabs) => {  // Query all open tabs
+      for (let tab of tabs) {
+        injectMouseControlScripts(tab.id, false); // Stop mouse control on each tab
+      }
     });
   }
 });
 
-// Function to inject mouse control scripts (start or stop based on flag)
+// Function to inject content scripts for starting or stopping mouse control
 function injectMouseControlScripts(tabId, shouldStart) {
-  if (shouldStart) {
-    // Inject startMouseControl
-    chrome.scripting.executeScript({
-      target: { tabId: tabId },
-      function: startMouseControl
-    }, () => {
-      console.log("startMouseControl injected on tab ID:", tabId);
-    });
-  } else {
-    // Inject stopMouseControl
-    chrome.scripting.executeScript({
-      target: { tabId: tabId },
-      function: stopMouseControl
-    }, () => {
-      console.log("stopMouseControl injected on tab ID:", tabId);
-    });
-  }
-}
-
-// Start mouse control function
-function startMouseControl() {
-  document.body.style.cursor = 'none'; // Hide the default cursor
-  const svgPointer = document.createElement('img');
-  svgPointer.id = 'custom-pointer';
-  svgPointer.style.position = 'absolute';
-  svgPointer.style.width = '24px';  // Adjust size
-  svgPointer.style.height = '24px';
-  
-  // Load the SVG file from the extension's directory
-  svgPointer.src = chrome.runtime.getURL('icons/cursor.svg'); // Path to your SVG file
-  
-  // Append to body
-  document.body.appendChild(svgPointer);
-  
-  // Track mouse movement and update SVG position
-  document.addEventListener('mousemove', (event) => {
-    logMousePosition(event, svgPointer);
+  const action = shouldStart ? 'startMouseControl' : 'stopMouseControl';
+  chrome.scripting.executeScript({
+    target: { tabId: tabId },
+    function: () => {
+      chrome.runtime.sendMessage({ action });
+    }
   });
-}
-
-// Stop mouse control function
-function stopMouseControl() {
-  document.body.style.cursor = 'auto';  // Restore the cursor
-  document.removeEventListener('mousemove', logMousePosition);
-}
-
-// Log the mouse position
-function logMousePosition(event, svgPointer) {
-  // Update the position of the custom SVG pointer
-  svgPointer.style.left = `${event.clientX - svgPointer.width / 2}px`;
-  svgPointer.style.top = `${event.clientY - svgPointer.height / 2}px`;
-  
 }
