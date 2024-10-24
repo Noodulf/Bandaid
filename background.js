@@ -33,10 +33,21 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // Function to inject content scripts for starting or stopping mouse control
 function injectMouseControlScripts(tabId, shouldStart) {
   const action = shouldStart ? 'startMouseControl' : 'stopMouseControl';
+  
+  console.log(`Injecting script to ${action} on tab ${tabId}`);  // Log the action
+  
+  // Inject the content script into the target tab, then send the appropriate message
   chrome.scripting.executeScript({
     target: { tabId: tabId },
-    function: () => {
-      chrome.runtime.sendMessage({ action });
-    }
+    files: ['content.js']  // Make sure to specify your content script file here
+  }, () => {
+    // Send a message to the content script once injected
+    chrome.tabs.sendMessage(tabId, { action }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.error(chrome.runtime.lastError.message);
+      } else {
+        console.log('Message sent to content script:', response);
+      }
+    });
   });
 }

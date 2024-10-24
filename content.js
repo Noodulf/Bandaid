@@ -1,4 +1,5 @@
 // Start mouse control function
+console.log('Content script loaded');
 function startMouseControl() {
   document.body.style.cursor = 'none';  // Hide the default cursor
   console.log('Mouse control started');
@@ -14,7 +15,7 @@ function startMouseControl() {
   svgPointer.style.width = '24px';  // Adjust size
   svgPointer.style.height = '24px';
   svgPointer.style.pointerEvents = 'none';  // Ensure it doesn't block mouse events
-  svgPointer.style.zIndex = '9999';  // Ensure it's on top of everything
+  svgPointer.style.zIndex = '2147483647';  // Ensure it's on top of everything
   
   // Load the SVG file from the extension's directory
   svgPointer.src = chrome.runtime.getURL('icons/cursor.svg');  // Path to your SVG file
@@ -42,13 +43,14 @@ function stopMouseControl() {
 function updateSVGPosition(event) {
   const svgPointer = document.getElementById('bandaid-pointer');
   if (svgPointer) {
-    svgPointer.style.transform = `translate(${event.clientX}px, ${event.clientY}px)`;  // Move the pointer
-  }
+    svgPointer.style.left = `${event.clientX}px`;
+    svgPointer.style.top = `${event.clientY}px`;  }
 }
 
 // Listen for messages from background.js
 chrome.runtime.onMessage.addListener((request) => {
   if (request.action === 'startMouseControl') {
+    console.log('Starting mouse control: ', request.action);
     startMouseControl();
   } else if (request.action === 'stopMouseControl') {
     stopMouseControl();
