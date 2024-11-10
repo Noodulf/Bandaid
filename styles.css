@@ -24,3 +24,12 @@ body {
     background-color: #45a049;
   }
   
+  input {
+    width: 200px;
+    padding: 5px;
+  }
+
+  .hover-effect {
+    background-color: lightblue; /* Example */
+    color: white;
+  }
