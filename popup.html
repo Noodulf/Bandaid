@@ -1,16 +1,55 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <link rel="stylesheet" href="styles.css">
-  </head>
-  <body>
-    <h1>Mouse Control</h1>
-    <div class="box">
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connection Interface</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div id="popup-container">
+    <!-- Step 1: Role Selection -->
+    <div id="role-selection">
+      <h2>Select Role</h2>
+      <button id="sender-btn">Sender (Controller)</button>
+      <button id="receiver-btn">Receiver (Controlled Device)</button>
+      
+      <h1>WebSocket Controller</h1>
+      <button id="connectBtn">Connect</button>
+      <button id="disconnectBtn" disabled>Disconnect</button>
+      <div class="status" id="status">Status: Disconnected</div>
+      <script src="popup.js"></script>
+    </div>
+
+    <!-- Step 2: Connect Screen -->
+    <div id="connect-screen" class="hidden">
+      <h2>Enter Code to Connect</h2>
+      <label for="code-input">Enter 6-digit code:</label>
+      <input type="text" id="code-input" maxlength="6">
+      <button id="connectPeer">Connect</button>
+    </div>
+
+    <!-- Step 3: Video Selection for Sender / Start/Stop for Receiver -->
+    <div id="video-selection-screen" class="hidden">
+      <h2 id="video-selection-header">Select Video Element</h2>
+      <!-- For Sender, Show Video Elements -->
+      <div id="video-container">
+        <button id="select-video-btn">Select Video Element</button>
+        <button id="next-video-btn">→ Next</button>
+      </div>
+
+      <!-- For Receiver, Show Control Options -->
+      <div id="control-buttons" class="hidden">
         <button id="start">Start Control</button>
         <button id="stop">Stop Control</button>
+        <input type="text" id="controlInput" placeholder="Type 'c' to click" autofocus />
       </div>
-      <input type="text" id="controlInput" placeholder="Type 'c' to click" autofocus />
+    </div>
+  </div>
 
-    <script src="popup.js"></script>
-  </body>
+  <script src="popup.js"></script>
+</body>
+
 </html>
